@@ -28,7 +28,7 @@ import os
 import re
 import signal
 import sys
-import thread as thread
+import _thread as thread
 import time
 import uinput
 from subprocess import Popen, PIPE, check_output, check_call
@@ -339,8 +339,8 @@ if keysConfig.has_option("HOTKEYS", "QUICKSAVE"):
 
 # Initialise Buttons
 for button in BUTTONS:
+    print("Button: {}".format(button))
     gpio.add_event_detect(button, gpio.BOTH, callback=handle_button, bouncetime=1)
-    logging.debug("Button: {}".format(button))
 
 for key, pin in keysConfig.items('HOTKEYS'):
     HOTKEYS.append(int(pin))
@@ -351,8 +351,8 @@ for key, pin in keysConfig.items('HOTKEYS'):
             gpio.add_event_detect(int(pin), gpio.BOTH, callback=handle_button, bouncetime=1)
 
 # Send centering commands
-device.emit(uinput.ABS_X, VREF / 2, syn=False);
-device.emit(uinput.ABS_Y, VREF / 2);
+device.emit(uinput.ABS_X, int(VREF / 2), syn=False);
+device.emit(uinput.ABS_Y, int(VREF / 2));
 
 # Set up OSD service
 try:
@@ -386,8 +386,8 @@ def checkShdn(volt):
 def readVoltage():
     global last_bat_read;
     voltVal = adc.read_adc(0, gain=1)
-    print voltVal
-    print 'read'
+    print(voltVal)
+    print('read')
     volt = int((float(voltVal) * (4.09 / 2047.0)) * 100)
 
     if volt < 300 or (last_bat_read > 300 and last_bat_read - volt > 6 and not last_bat_read == 450):
@@ -452,7 +452,7 @@ def readModeWifi(toggle=False):
         return ret
     # check signal
     raw = check_output(['cat', '/proc/net/wireless'])
-    strengthObj = re.search(r'.wlan0: \d*\s*(\d*)\.\s*[-]?(\d*)\.', raw, re.I)
+    strengthObj = re.search(r'.wlan0: \d*\s*(\d*)\.\s*[-]?(\d*)\.', raw.decode(), re.I)
     if strengthObj:
         strength = 0
         if (int(strengthObj.group(1)) > 0):
@@ -508,7 +508,7 @@ def readModeBluetooth(toggle=False):
         return ret
     # check if it's enabled
     raw = check_output(['hcitool', 'dev'])
-    return True if raw.find("hci0") > -1 else False
+    return True if raw.decode().find("hci0") > -1 else False
 
 
 # Do a shutdown
@@ -678,7 +678,7 @@ try:
                 bat = getVoltagepercent(volt)
             checkShdn(volt)
             updateOSD(volt, bat, 20, wifi, volume, lowbattery, info, charge, bluetooth)
-            print 'update OSD'
+            print('update OSD')
             overrideCounter.wait(10)
             if overrideCounter.is_set():
                 overrideCounter.clear()

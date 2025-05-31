@@ -7,12 +7,22 @@ This software is designed to be used on Raspberry Pi handheld systems, such as t
 
 ## Build instructions:  
   
+### Install dependencies
+
+* sudo apt-get install libraspberrypi-dev raspberrypi-kernel-headers libpng-dev
+
+### Build
+
 * git clone --recursive https://github.com/withgallantry/OneForAll.git  
   
 * make  
   
 ## How to use it:  
   
-* Configure (edit) the monitor script accordingly to your hardware configuration  
+* Install monitor script dependencies:
+  - Adafruit_ADS1x15
+  - uinput
+
+* Configure (edit) the monitor script and config files accordingly to your hardware configuration.  
   
-* sudo python monitor_evdev.py
+* sudo python monitor.py (or you can configure udev rules accordingly to avoid needing to run as root).
