@@ -339,7 +339,6 @@ if keysConfig.has_option("HOTKEYS", "QUICKSAVE"):
 
 # Initialise Buttons
 for button in BUTTONS:
-    print("Button: {}".format(button))
     gpio.add_event_detect(button, gpio.BOTH, callback=handle_button, bouncetime=1)
 
 for key, pin in keysConfig.items('HOTKEYS'):
@@ -357,7 +356,9 @@ device.emit(uinput.ABS_Y, int(VREF / 2));
 # Set up OSD service
 try:
     mode = "nojoystick" if JOYSTICK_ENABLED == 'False' else "full"
-    osd_proc = Popen([osd_path, bin_dir, mode], stdin=PIPE)
+    osd_proc = Popen([osd_path, bin_dir, mode], stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True)
+
+    osd_in = osd_proc.stdin
 
     def _monitor_osd():
         ret = osd_proc.wait()
@@ -689,7 +690,7 @@ try:
             overrideCounter.wait(10)
             if overrideCounter.is_set():
                 overrideCounter.clear()
-            runCounter = 0;
+            runCounter = 0
 
         except Exception:
             logging.info("EXCEPTION")
