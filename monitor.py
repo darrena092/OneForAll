@@ -369,7 +369,7 @@ try:
     time.sleep(1)
     if osd_proc.poll() is not None:
         logging.error(f"ERROR: Failed to start OSD, got return code [{osd_proc.poll()}]")
-        sys.exit(1)
+        os.kill(os.getpid(), signal.SIGINT)
 
 except Exception:
     logging.exception("ERROR: Failed start OSD binary")
