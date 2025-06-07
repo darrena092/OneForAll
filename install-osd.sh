@@ -17,9 +17,13 @@ fi
 
 # --------- Install dependencies -----------
 apt-get -y update
-apt-get -y install python3 python3-uinput python3-pip
+apt-get -y install python3 python3-uinput python3-pip libraspberrypi-dev raspberrypi-kernel-headers
 pip3 install Adafruit_ADS1x15
 # ------------------------------------------
+
+# --------- Build OSD ---------------------
+make -j4
+#------------------------------------------
 
 # ---------- Ensure uinput is loaded ----------
 if ! lsmod | grep -q '^uinput'; then
@@ -42,10 +46,31 @@ fi
 CONFIG_FILE="/boot/config.txt"
 I2C_WAS_ALREADY_ENABLED=true
 
-if ! grep -q '^dtparam=i2c_arm=on' "$CONFIG_FILE"; then
-    echo "Enabling i2c_arm..."
-    echo 'dtparam=i2c_arm=on' | tee -a "$CONFIG_FILE"
+# Enable i2c_arm in config.txt
+if grep -q '^\s*#\s*dtparam=i2c_arm=on' "$CONFIG_FILE"; then
+    echo "Uncommenting i2c_arm..."
+    sed -i 's/^\s*#\s*dtparam=i2c_arm=on/dtparam=i2c_arm=on/' "$CONFIG_FILE"
     I2C_WAS_ALREADY_ENABLED=false
+elif ! grep -q '^\s*dtparam=i2c_arm=on' "$CONFIG_FILE"; then
+    echo "Adding i2c_arm=on to config.txt..."
+    echo 'dtparam=i2c_arm=on' >> "$CONFIG_FILE"
+    I2C_WAS_ALREADY_ENABLED=false
+fi
+
+# Load i2c-dev module now
+if ! lsmod | grep -q '^i2c_dev'; then
+    echo "Loading i2c-dev kernel module..."
+    modprobe i2c-dev
+else
+    echo "i2c-dev module already loaded."
+fi
+
+# Ensure it loads at boot
+if ! grep -q '^i2c-dev' /etc/modules; then
+    echo "Adding i2c-dev to /etc/modules..."
+    echo 'i2c-dev' >> /etc/modules
+else
+    echo "i2c-dev already set to load at boot."
 fi
 # ------------------------------------------
 
