@@ -73,7 +73,7 @@ systemctl enable fbcp.service
 # ------------------------------------------
 
 # ---------- Configure firmware ------------
-CONFIG_FILE="/boot/firmware/config.txt"
+CONFIG_FILE="/boot/config.txt"
 
 # Use FKMS driver for dispmanx compatibility
 sed -i 's/^dtoverlay=vc4-kms-v3d$/dtoverlay=vc4-fkms-v3d/' "$CONFIG_FILE"

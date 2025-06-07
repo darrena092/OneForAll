@@ -17,8 +17,8 @@ fi
 
 # --------- Install dependencies -----------
 apt-get -y update
-apt-get -y install python3 python3-uinput
-pip3 install Adafruit_ADS1x15 --break-system-packages
+apt-get -y install python3 python3-uinput python3-pip
+pip3 install Adafruit_ADS1x15
 # ------------------------------------------
 
 # ---------- Ensure uinput is loaded ----------
@@ -39,7 +39,7 @@ fi
 # --------------------------------------------
 
 # ---------- Configure firmware ------------
-CONFIG_FILE="/boot/firmware/config.txt"
+CONFIG_FILE="/boot/config.txt"
 I2C_WAS_ALREADY_ENABLED=true
 
 if ! grep -q '^dtparam=i2c_arm=on' "$CONFIG_FILE"; then
