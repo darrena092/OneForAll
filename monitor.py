@@ -356,19 +356,24 @@ device.emit(uinput.ABS_Y, int(VREF / 2));
 
 # Set up OSD service
 try:
-    if JOYSTICK_ENABLED == 'False':
-        osd_proc = Popen([osd_path, bin_dir, "nojoystick"], shell=False, stdin=PIPE, stdout=None, stderr=None)
-    else:
-        osd_proc = Popen([osd_path, bin_dir, "full"], shell=False, stdin=PIPE, stdout=None, stderr=None)
-    osd_in = osd_proc.stdin
-    time.sleep(1)
-    osd_poll = osd_proc.poll()
-    if (osd_poll):
-        logging.error("ERROR: Failed to start OSD, got return code [" + str(osd_poll) + "]\n")
+    mode = "nojoystick" if JOYSTICK_ENABLED == 'False' else "full"
+    osd_proc = Popen([osd_path, bin_dir, mode], stdin=PIPE)
+
+    def _monitor_osd():
+        ret = osd_proc.wait()
+        logging.error(f"ERROR: OSD binary died with return code [{ret}]")
         sys.exit(1)
-except Exception as e:
-    logging.exception("ERROR: Failed start OSD binary");
-    sys.exit(1);
+
+    monitor = thread.start_new_thread(_monitor_osd, ())
+
+    time.sleep(1)
+    if osd_proc.poll() is not None:
+        logging.error(f"ERROR: Failed to start OSD, got return code [{osd_proc.poll()}]")
+        sys.exit(1)
+
+except Exception:
+    logging.exception("ERROR: Failed start OSD binary")
+    sys.exit(1)
 
 
 # Check for shutdown state
