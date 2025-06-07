@@ -17,7 +17,7 @@ fi
 
 # --------- Install dependencies -----------
 apt-get -y update
-apt-get -y install python3 python3-uinput python3-pip libraspberrypi-dev raspberrypi-kernel-headers
+apt-get -y install python3 python3-uinput python3-pip libraspberrypi-dev raspberrypi-kernel-headers libpng-dev
 pip3 install Adafruit_ADS1x15
 # ------------------------------------------
 
